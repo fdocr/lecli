@@ -1,5 +1,5 @@
 require "lecli/version"
-require "lecli/cli"
+require "lecli/certificate_builder"
 
 module LECLI
   # Your code goes here...
