@@ -1,4 +1,7 @@
 require "thor"
+require "acme-client"
+require "uri"
+require "fileutils"
 
 module LECLI
   class CertificateBuilder
@@ -50,7 +53,11 @@ module LECLI
       pending = true
       while pending
         challenges.each do |challenge|
-          challenge.request_validation
+          begin
+            challenge.request_validation
+          rescue Acme::Client::Error::Malformed
+            print "."
+          end
         end
 
         status = challenges.map(&:status)
