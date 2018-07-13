@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lecli (0.1.0)
+    lecli (0.2.1)
       thor (~> 0.20.0)
 
 GEM
