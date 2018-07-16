@@ -1,60 +1,46 @@
 #!/usr/bin/env ruby
 
-require "thor"
-require "yaml"
-require "lecli"
+require 'thor'
+require 'yaml'
+require 'lecli'
 
+# Class in charge of the CLI functionallity powered by Thor
 class LECLIRunner < Thor
-
-  YAML_FILENAME = ".lecli.yml"
-
-  desc "version", "Prints out the gem version"
+  desc 'version', 'Prints out the gem version'
   def version
-    puts "v#{LECLI::VERSION}"
+    puts LECLI::VERSION
   end
 
-  desc "yaml", "Generates the #{YAML_FILENAME} file with all default options"
+  desc 'yaml', 'Generates the options file with defaults to customize'
   option :override,
-    type: :boolean,
-    aliases: [:o],
-    desc: "Overrides the existing #{YAML_FILENAME} if any exist."
+         type: :boolean,
+         aliases: [:o],
+         desc: 'Overrides the existing options file the defaults.'
   def yaml
-    if !File.file?(YAML_FILENAME) || options[:override]
-      hash = LECLI::CertificateBuilder.default_options_yaml
-      File.write(YAML_FILENAME, hash.to_yaml)
-      puts YAML_FILENAME
-    else
-      puts "ERROR: #{YAML_FILENAME} file already exists. Try `lecli help yaml`"
-    end
+    LECLI::CertificateBuilder.persist_defaults_file(
+      override: options[:override]
+    )
   end
 
-  desc "generate", "Requests and outputs Let's Encrypt SSL Certificates"
+  desc 'generate', 'Requests and outputs Let\'s Encrypt SSL Certificates'
   option :production,
-    type: :boolean,
-    aliases: [:p],
-    desc: "Use Let's Encrypt production API endpoint."
+         type: :boolean,
+         aliases: [:p],
+         desc: 'Use Let\'s Encrypt production API endpoint.'
   def generate
-    begin
-      # Load defaults and merge with the config file data
-      hash = LECLI::CertificateBuilder.default_options_yaml
-      if File.file?(YAML_FILENAME)
-        hash = hash.merge(YAML.load_file(YAML_FILENAME))
-      end
-    rescue
-      puts "ERROR: Invalid format for file #{YAML_FILENAME}"
-      return 1
+    opts = LECLI::CertificateBuilder.load_options
+    return if opts.nil? # Bail if options can't be loaded properly
+
+    builder = LECLI::CertificateBuilder.new do |b|
+      b.production = options[:production]
     end
+    builder.generate_certs(opts)
+    puts 'Certificates generated successfully!'
 
-    hash["production"] = options[:production]
-    LECLI::CertificateBuilder.generate_certs(hash)
-
-    puts "Certificates generated successfully!"
-
-    script_path = hash["success_callback_script"]
-    if File.file?(script_path)
-      puts "Execution attempt of success callback script `#{script_path}`"
-      `./#{script_path}`
-    end
+    script_path = File.expand_path(opts['success_callback_script'])
+    return if File.file?(script_path)
+    puts "Executing now success callback script `#{script_path}`..."
+    `./#{script_path}`
   end
 end
 

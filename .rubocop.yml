@@ -1,0 +1,13 @@
+Metrics/MethodLength:
+  Max: 20
+Metrics/ClassLength:
+  Max: 150
+Metrics/BlockLength:
+  Exclude:
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'spec/**/*.rb'
+Style/ExpandPathArguments:
+  Enabled: false
+Style/WordArray:
+  Enabled: false
