@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Fernando Valverde Arredondo']
   spec.email         = ['fdov88@gmail.com']
 
-  spec.summary       = 'Let\'s Encrypt CLI to generate certificates'
-  spec.description   = 'Let\'s Encrypt CLI to generate certificates'
+  spec.summary       = 'CLI to generate Let\'s Encrypt certificates'
+  spec.description   = 'CLI to generate Let\'s Encrypt certificates'
   spec.homepage      = 'https://github.com/fdoxyz/lecli'
   spec.license       = 'MIT'
 

@@ -24,7 +24,7 @@ module LECLI
 
     def self.default_options
       {
-        'port' => 3333,
+        'port' => 80,
         'domains' => ['example.com'],
         'common_name' => 'Let\'s Encrypt',
         'account_email' => 'test@account.com',

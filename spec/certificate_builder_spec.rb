@@ -42,7 +42,7 @@ RSpec.describe LECLI::CertificateBuilder do
     FileUtils.rm(filename)
   end
 
-  it 'creates orders' do
+  it 'creates an order' do
     builder = LECLI::CertificateBuilder.new
     opts = { email: 'tester@gmail.com', domains: ['example.com'] }
     builder.send(:create_order, opts)
