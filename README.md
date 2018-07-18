@@ -39,7 +39,7 @@ From the two available types of validation requests only HTTP (and not DNS) is s
 
 The tokens are written to a single **challenges_relative_path** and need to be served behind each domain you are requesting, i.e. `example.com/.well-known/acme-challenge/#{token_filename}`. If requesting multiple domains at once you will need additional setup to route from each domain requested to where the tokens are persisted. When working with a single domain, for example, you can just make this relative path write the tokens on `/usr/share/nginx/html/.well-known/acme-challenge/` if working with an nginx server.
 
-[ [ DIAGRAM OF THE SERVER LAYOUT ] ]
+![alt text](https://github.com/fdoxyz/lecli/blob/master/lecli_diagram.png)
 
 After Let's Encrypt is able to access both tokens on the list of domain addresses requested the certificates can be issued. The resulting certificate will be identified by the **email** and under the **common_name** provided. The name of the `.pem` files can be customized with **request_key** and **certificate_key**.
 
