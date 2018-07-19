@@ -24,7 +24,6 @@ module LECLI
 
     def self.default_options
       {
-        'port' => 80,
         'domains' => ['example.com'],
         'common_name' => 'Let\'s Encrypt',
         'account_email' => 'test@account.com',
@@ -35,6 +34,11 @@ module LECLI
       }
     end
 
+    def self.load_options(config_file:)
+      opts = LECLI::CertificateBuilder.default_options
+      opts.merge(YAML.load_file(config_file)) if File.file?(config_file)
+    end
+
     def self.persist_defaults_file(override:)
       opts = LECLI::CertificateBuilder.default_options
       if !File.file?(YAML_FILENAME) || override
@@ -42,15 +46,6 @@ module LECLI
         puts YAML_FILENAME
       else
         puts "#{YAML_FILENAME} already exists. Try `lecli help yaml`"
-      end
-    end
-
-    def self.load_options
-      opts = LECLI::CertificateBuilder.default_options
-      if File.file?(YAML_FILENAME)
-        opts.merge(YAML.load_file(YAML_FILENAME))
-      else
-        opts
       end
     end
 

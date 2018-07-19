@@ -19,7 +19,7 @@ RSpec.describe LECLI::CertificateBuilder do
   it 'should provide a defaults hash' do
     opts = LECLI::CertificateBuilder.default_options
     options_available = [
-      'port', 'domains', 'common_name', 'account_email', 'request_key',
+      'domains', 'common_name', 'account_email', 'request_key',
       'certificate_key', 'challenges_relative_path', 'success_callback_script'
     ]
     expect(opts.keys).to eq(options_available)
@@ -27,16 +27,17 @@ RSpec.describe LECLI::CertificateBuilder do
 
   it 'should load options including config from `.lecli.yml`' do
     # Setup custom port
+    test_name = 'Test'
     filename = LECLI::CertificateBuilder::YAML_FILENAME
-    File.write(filename, { 'port' => 1010 }.to_yaml)
+    File.write(filename, { 'common_name' => test_name }.to_yaml)
 
-    opts = LECLI::CertificateBuilder.load_options
+    opts = LECLI::CertificateBuilder.load_options(config_file: filename)
     options_available = [
-      'port', 'domains', 'common_name', 'account_email', 'request_key',
+      'domains', 'common_name', 'account_email', 'request_key',
       'certificate_key', 'challenges_relative_path', 'success_callback_script'
     ]
     expect(opts.keys).to eq(options_available)
-    expect(opts['port']).to eq(1010)
+    expect(opts['common_name']).to eq(test_name)
 
     # Cleanup
     FileUtils.rm(filename)

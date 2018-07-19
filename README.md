@@ -20,7 +20,6 @@ Now let's see what's inside
 
 ```
 ---
-port: 80
 domains:
 - example.com
 common_name: Let's Encrypt
@@ -35,7 +34,7 @@ Most entries are optional, except those that specify the domains you are request
 
 ### The flow
 
-From the two available types of validation requests only HTTP (and not DNS) is supported [yet](#Contributing). This means you'll need to serve a token (lecli will create them) behind each domain in the **list of domain addresses** requested, on a certain **port**.
+From the two available types of validation requests only HTTP (and not DNS) is supported [yet](#contributing). This means you'll need to serve a token (lecli will create them) behind each domain in the **list of domain addresses** requested, on a certain **port**.
 
 The tokens are written to a single **challenges_relative_path** and need to be served behind each domain you are requesting, i.e. `example.com/.well-known/acme-challenge/#{token_filename}`. If requesting multiple domains at once you will need additional setup to route from each domain requested to where the tokens are persisted. When working with a single domain, for example, you can just make this relative path write the tokens on `/usr/share/nginx/html/.well-known/acme-challenge/` if working with an nginx server.
 
@@ -45,7 +44,7 @@ After Let's Encrypt is able to access both tokens on the list of domain addresse
 
 Optionally you can specify a script filename with **success_callback_script**. This script will function as a "callback hook" and it will be run after successfully exporting the domains' certificate.
 
-In this section you've read about all `lecli.yml` options available (in **bold**). Now, if you've made sure you: (1) Customized the options in this file to create the desired certificate, and (2) made sure the **success_callback_script** path is available for a public internet. You are now ready to kick off the validation process by executing the following on your terminal
+In this section you've read about all `lecli.yml` options available (keywords in **bold**). Now, if you've made sure you: (1) Customized the options in this file to create the desired certificate, and (2) made sure the **success_callback_script** path is available for a public internet. You are now ready to kick off the validation process by executing the following on your terminal
 
 ```
 lecli generate
@@ -69,13 +68,15 @@ server {
 
 You can script a server restart if needed, or any other setup that you require to make use of the newly created certificates. Just make sure to point the **success_callback_script** path in your config file so the CLI can automatically execute it if the request result was success.
 
-If you pair the CLI with a cron-job (specially using the [whenever](https://github.com/javan/whenever) gem) you've essentially "hooked up" the same Let's Encrypt bot and now can leverage ruby scripting, which at least to me is generally a breeze. You can now generate your certificates periodically and customize whatever part of the process you need, for example using whenever:
+If you pair the CLI with a cron-job (specially using the [whenever](https://github.com/javan/whenever) gem) you've essentially put together a Let's Encrypt bot and can now leverage scripting for complex deployments. Your certificates will be renewed periodically. When using **whenever** you'll have lecli CLI in your crontab as easy as:
 
 ```
 every :month, at: '4am' do
-  command "/path/to/config/file/lecli --production"
+  command "lecli --production -f /path/to/config/file.yml"
 end
 ```
+
+Be sure to run `lecli help` for more details.
 
 ## Development
 

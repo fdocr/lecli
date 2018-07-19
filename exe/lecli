@@ -27,9 +27,18 @@ class LECLIRunner < Thor
          type: :boolean,
          aliases: [:p],
          desc: 'Use Let\'s Encrypt production API endpoint.'
+  option :config_file,
+         default: '.lecli.yml',
+         aliases: [:f],
+         desc: 'Specify the path of the configuration file.'
   def generate
-    opts = LECLI::CertificateBuilder.load_options
-    return if opts.nil? # Bail if options can't be loaded properly
+    puts "LOL: #{options[:config_file]}"
+    return
+    opts = LECLI::CertificateBuilder.load_options(config_file: config_file)
+    if opts.nil? # Bail if options can't be loaded properly
+      puts 'Unable to locate .lecli.yml file. Try `lecli help generate`'
+      return
+    end
 
     builder = LECLI::CertificateBuilder.new do |b|
       b.production = options[:production]
