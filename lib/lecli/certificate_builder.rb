@@ -84,7 +84,7 @@ module LECLI
       request_key = OpenSSL::PKey::RSA.new(4096)
       csr = Acme::Client::CertificateRequest.new(
         private_key: request_key,
-        names: domains.values,
+        names: domains,
         subject: { common_name: title }
       )
       @order.finalize(csr: csr)
