@@ -32,9 +32,8 @@ class LECLIRunner < Thor
          aliases: [:f],
          desc: 'Specify the path of the configuration file.'
   def generate
-    puts "LOL: #{options[:config_file]}"
-    return
-    opts = LECLI::CertificateBuilder.load_options(config_file: config_file)
+    config_path = options[:config_file]
+    opts = LECLI::CertificateBuilder.load_options(config_file: config_path)
     if opts.nil? # Bail if options can't be loaded properly
       puts 'Unable to locate .lecli.yml file. Try `lecli help generate`'
       return
