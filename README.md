@@ -30,21 +30,21 @@ challenges_relative_path: challenges
 success_callback_script: deploy.sh
 ```
 
-Most entries are optional, except those that specify the domains you are requesting and "identity fields". Meaning that at least **domains** (list of entries), **common_name** and **account_email** should always appear in order to perform a valid request.
+Most entries are optional, except those that specify the request domains and "identity fields". Meaning that at least **domains** (list of domains), **common_name** (your company/name) and **account_email** should always appear in order to perform a valid request.
 
 ### The flow
 
-From the two available types of validation requests only HTTP (and not DNS) is supported [yet](#contributing). This means you'll need to serve a token (lecli will create them) behind each domain in the **list of domain addresses** requested, on a certain **port**.
+From the two available types of validation requests only HTTP (and not DNS) is supported [yet](#contributing). This means you'll need to serve a token (lecli will create them) behind each domain in the **list of domain addresses** requested.
 
-The tokens are written to a single **challenges_relative_path** and need to be served behind each domain you are requesting, i.e. `example.com/.well-known/acme-challenge/#{token_filename}`. If requesting multiple domains at once you will need additional setup to route from each domain requested to where the tokens are persisted. When working with a single domain, for example, you can just make this relative path write the tokens on `/usr/share/nginx/html/.well-known/acme-challenge/` if working with an nginx server.
+The tokens are written to **challenges_relative_path** and need to be served behind each domain you are requesting, i.e. `example.com/.well-known/acme-challenge/#{token_filename}` needs to return the token. If requesting multiple domains at once you will need additional setup to route from each domain requested to where the tokens are persisted. When working with a single domain, for example, you can just make this relative path write the tokens on `/usr/share/nginx/html/.well-known/acme-challenge/` if working with an nginx server.
 
 ![alt text](https://github.com/fdoxyz/lecli/blob/master/lecli_diagram.png)
 
-After Let's Encrypt is able to access both tokens on the list of domain addresses requested the certificates can be issued. The resulting certificate will be identified by the **email** and under the **common_name** provided. The name of the `.pem` files can be customized with **request_key** and **certificate_key**.
+After Let's Encrypt is able to access both tokens on the list of domain addresses requested the certificates can be issued. The resulting certificate will be identified by the **email** and under the **common_name** provided. The certificates (`.pem` files) can be renamed with **request_key** and **certificate_key**.
 
-Optionally you can specify a script filename with **success_callback_script**. This script will function as a "callback hook" and it will be run after successfully exporting the domains' certificate.
+Optionally you can specify a script with **success_callback_script** to be executed. This script will function as a "callback hook" and it will run after successfully exporting the domains' certificate.
 
-In this section you've read about all `lecli.yml` options available (keywords in **bold**). Now, if you've made sure you: (1) Customized the options in this file to create the desired certificate, and (2) made sure the **success_callback_script** path is available for a public internet. You are now ready to kick off the validation process by executing the following on your terminal
+Now you've read about `lecli.yml` options available (keywords in **bold**). If you've made sure to: (1) Customized the options config file to create the desired certificate, and (2) made sure the **challenges_relative_path** path is available for a public internet request, then you're now ready to kick off the validation process by executing the following on your terminal
 
 ```
 lecli generate
@@ -66,9 +66,9 @@ server {
 }
 ```
 
-You can script a server restart if needed, or any other setup that you require to make use of the newly created certificates. Just make sure to point the **success_callback_script** path in your config file so the CLI can automatically execute it if the request result was success.
+You can script a server restart if needed, or any other setup that you require to make use of the newly created certificates. Just make sure to point the **success_callback_script** path in your config file (and the script is 'executable') so the CLI can automatically execute it if the request result was successful.
 
-If you pair the CLI with a cron-job (specially using the [whenever](https://github.com/javan/whenever) gem) you've essentially put together a Let's Encrypt bot and can now leverage scripting for complex deployments. Your certificates will be renewed periodically. When using **whenever** you'll have lecli CLI in your crontab as easy as:
+If you pair the CLI with a cron-job (specially using the [whenever](https://github.com/javan/whenever) gem) you've essentially put together a Let's Encrypt bot and can now leverage scripting for more complex deployments. Your certificates will be renewed periodically. When using **whenever** you'll have lecli CLI in your crontab as easy as:
 
 ```
 every :month, at: '4am' do
