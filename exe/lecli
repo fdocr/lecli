@@ -48,7 +48,7 @@ class LECLIRunner < Thor
     script_path = File.expand_path(opts['success_callback_script'])
     return if File.file?(script_path)
     puts "Executing now success callback script `#{script_path}`..."
-    `./#{script_path}`
+    `.#{script_path}`
   end
 end
 
