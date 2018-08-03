@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lecli (0.2.7)
+    lecli (0.2.8)
       acme-client (~> 2.0.0)
       thor (~> 0.20.0)
 
