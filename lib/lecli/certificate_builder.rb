@@ -50,21 +50,30 @@ module LECLI
     end
 
     def generate_certs(options)
-      request_challenges(options: options)
-      sleep(3) # We are unaware of challenge hosting, better give them some time
+      success = true
 
-      request_challenge_validation
-      request_key = finalize_order(
-        domains: options['domains'],
-        title: options['common_name']
-      )
+      begin
+        request_challenges(options: options)
+        sleep(3) # We are unaware of challenge hosting, better give extra time
 
-      write_certificate(
-        cert: @order.certificate, relative_path: options['certificate_key']
-      )
-      write_certificate(
-        cert: request_key, relative_path: options['request_key']
-      )
+        request_challenge_validation
+        request_key = finalize_order(
+          domains: options['domains'],
+          title: options['common_name']
+        )
+
+        write_certificate(
+          cert: @order.certificate, relative_path: options['certificate_key']
+        )
+        write_certificate(
+          cert: request_key, relative_path: options['request_key']
+        )
+      rescue Acme::Client::Error::RateLimited => e
+        puts e.message
+        success = false
+      end
+
+      success
     end
 
     private
@@ -109,6 +118,7 @@ module LECLI
     end
 
     def request_challenge_validation
+      puts 'Requesting challenge validation and polling for confirmation...'
       wait_time = 5
       pending = true
       while pending

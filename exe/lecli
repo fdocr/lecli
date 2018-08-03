@@ -42,14 +42,13 @@ class LECLIRunner < Thor
     builder = LECLI::CertificateBuilder.new do |b|
       b.production = options[:production]
     end
-    builder.generate_certs(opts)
+    return unless builder.generate_certs(opts)
     puts 'Certificates generated successfully!'
 
     script_path = File.expand_path(opts['success_callback_script'])
     return if File.file?(script_path)
     puts "Executing now success callback script `#{script_path}`..."
-    success = system(".#{script_path}")
-    puts "Let's Encrypt certificates generated successfully" if success
+    exec(".#{script_path}")
   end
 end
 
