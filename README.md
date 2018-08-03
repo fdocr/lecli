@@ -1,14 +1,18 @@
 # lecli
 
-lecli is a gem that provides a CLI to generate Let's Encrypt certificates. It wraps around the [ACME protocol Client gem](https://github.com/unixcharles/acme-client). It pairs well with cron jobs and the [whenever gem](https://github.com/javan/whenever) for a tighter grip on automation/scripting customization.
+lecli is a gem that provides a CLI to generate Let's Encrypt certificates. Therefore, its name stands for **L**et's **E**ncrypt **CLI**.
+
+lecli wraps the lower level [ACME protocol Client gem](https://github.com/unixcharles/acme-client) with the intention to create your custom [Certbot](https://certbot.eff.org/), which you can use to automate/script around it. Because of this, lecli pairs well with cron jobs and the recommended [whenever gem](https://github.com/javan/whenever).
 
 ## Installation
 
-    $ gem install lecli
+```
+$ gem install lecli
+```
 
 ## Getting started
 
-The CLI will use the Let's Encrypt staging endpoint unless explicitly passed with the `--production` flag. All other configuration data is managed by a config file - `.lecli.yml`. To help understand the available options you can run the following in your terminal and a sample YAML file will be generated for you
+The CLI will use the Let's Encrypt staging endpoint unless explicitly passed the `--production` flag. All other configuration data is managed by a config file - `.lecli.yml`. To help understand the available options you can run the following in your terminal and a sample YAML file will be generated for you
 
 ```
 $ lecli yaml
@@ -16,13 +20,15 @@ $ lecli yaml
 
 Now let's see what's inside
 
-### `lecli.yml`
+### `.lecli.yml`
 
 ```
 ---
 domains:
 - example.com
-common_name: Let's Encrypt
+- test.net
+- yetanotherwebsite.com
+common_name: example.com
 account_email: test@account.com
 request_key: request.pem
 certificate_key: certificate.pem
