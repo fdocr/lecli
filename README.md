@@ -36,7 +36,7 @@ challenges_relative_path: challenges
 success_callback_script: deploy.sh
 ```
 
-Only required options in this file are **domains** (list of domains), **common_name** (your company/name) and **account_email**. All others can be deleted if you're OK with the defaults, all of which will be loaded for you *except* **success_callback_script**. If the callback script is not specified nothing will be executed after a successful certificate request.
+Only required options in this file are **domains** (list of domains), **common_name** and **account_email**. All others can be deleted if you're OK with the defaults, all of which will be loaded for you *except* **success_callback_script**. If the callback script is not specified nothing will be executed after a successful certificate request.
 
 ### The flow
 
