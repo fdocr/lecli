@@ -1,6 +1,16 @@
 require 'yaml'
 
 RSpec.describe LECLI::CertificateBuilder do
+  let!(:test_name) { 'Test' }
+  let!(:bad_opts_hash) { { 'common_name' => test_name } }
+  let!(:custom_opts_hash) do
+    {
+      'domains' => ['a.com', 'x.com'],
+      'common_name' => test_name,
+      'account_email' => 'elon@x.com'
+    }
+  end
+
   it 'should differentiate staging from production' do
     prod_url = 'https://acme-v02.api.letsencrypt.org/directory'
     staging_url = 'https://acme-staging-v02.api.letsencrypt.org/directory'
@@ -16,8 +26,14 @@ RSpec.describe LECLI::CertificateBuilder do
     expect(extracted_staging).to eq(staging_url)
   end
 
-  it 'should provide a defaults hash' do
-    opts = LECLI::CertificateBuilder.default_options
+  it 'should have a list of required options' do
+    opts = LECLI::CertificateBuilder.required_options
+    required_options = ['domains', 'common_name', 'account_email']
+    expect(opts).to eq(required_options)
+  end
+
+  it 'should provide a sample options hash' do
+    opts = LECLI::CertificateBuilder.sample_options
     options_available = [
       'domains', 'common_name', 'account_email', 'request_key',
       'certificate_key', 'challenges_relative_path', 'success_callback_script'
@@ -25,22 +41,35 @@ RSpec.describe LECLI::CertificateBuilder do
     expect(opts.keys).to eq(options_available)
   end
 
-  it 'should load options including config from `.lecli.yml`' do
-    # Setup custom port
-    test_name = 'Test'
+  it 'should provide a runtime default options hash' do
+    opts = LECLI::CertificateBuilder.runtime_defaults
+    options_available = [
+      'request_key', 'certificate_key', 'challenges_relative_path'
+    ]
+    expect(opts.keys).to eq(options_available)
+  end
+
+  it 'should load options including config from lecli.yml' do
     filename = LECLI::CertificateBuilder::YAML_FILENAME
-    File.write(filename, { 'common_name' => test_name }.to_yaml)
+    File.write(filename, custom_opts_hash.to_yaml)
 
     opts = LECLI::CertificateBuilder.load_options(config_file: filename)
     options_available = [
       'domains', 'common_name', 'account_email', 'request_key',
-      'certificate_key', 'challenges_relative_path', 'success_callback_script'
+      'certificate_key', 'challenges_relative_path'
     ]
-    expect(opts.keys).to eq(options_available)
+    expect(opts.keys.sort).to eq(options_available.sort)
     expect(opts['common_name']).to eq(test_name)
+    FileUtils.rm(filename) # Cleanup
+  end
 
-    # Cleanup
-    FileUtils.rm(filename)
+  it 'should fail if required fields not present in lecli.yml' do
+    filename = LECLI::CertificateBuilder::YAML_FILENAME
+    File.write(filename, bad_opts_hash.to_yaml)
+
+    opts = LECLI::CertificateBuilder.load_options(config_file: filename)
+    expect(opts).to be_nil
+    FileUtils.rm(filename) # Cleanup
   end
 
   it 'creates an order' do

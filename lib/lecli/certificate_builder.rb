@@ -8,7 +8,7 @@ module LECLI
   class CertificateBuilder
     attr_accessor :production
 
-    YAML_FILENAME = '.lecli.yml'.freeze
+    YAML_FILENAME = 'lecli.yml'.freeze
 
     def initialize
       @challenges = []
@@ -22,10 +22,14 @@ module LECLI
       @endpoint = @production ? prod_url : staging_url
     end
 
-    def self.default_options
+    def self.required_options
+      ['domains', 'common_name', 'account_email']
+    end
+
+    def self.sample_options
       {
-        'domains' => ['example.com'],
-        'common_name' => 'Let\'s Encrypt',
+        'domains' => ['example.com', 'test.net'],
+        'common_name' => 'example.com',
         'account_email' => 'test@account.com',
         'request_key' => 'request.pem',
         'certificate_key' => 'certificate.pem',
@@ -34,13 +38,25 @@ module LECLI
       }
     end
 
+    def self.runtime_defaults
+      {
+        'request_key' => 'request.pem',
+        'certificate_key' => 'certificate.pem',
+        'challenges_relative_path' => 'challenges'
+      }
+    end
+
     def self.load_options(config_file:)
-      opts = LECLI::CertificateBuilder.default_options
-      opts.merge(YAML.load_file(config_file)) if File.file?(config_file)
+      opts = LECLI::CertificateBuilder.runtime_defaults
+      opts.merge!(YAML.load_file(config_file)) if File.file?(config_file)
+      required_options = LECLI::CertificateBuilder.required_options
+
+      # Should return nil if all required options are not present
+      opts if (opts.keys & required_options).count == required_options.count
     end
 
     def self.persist_defaults_file(override:)
-      opts = LECLI::CertificateBuilder.default_options
+      opts = LECLI::CertificateBuilder.sample_options
       if !File.file?(YAML_FILENAME) || override
         File.write(YAML_FILENAME, opts.to_yaml)
         puts YAML_FILENAME
